@@ -1,0 +1,53 @@
+# Dependencies
+node_modules/
+ai/venv/
+**/__pycache__/
+*.py[cod]
+.Python
+
+# Build outputs
+backend/dist/
+frontend/dist/
+*.tsbuildinfo
+
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+!.env.example
+!.env.development
+
+# Databases & runtime data
+backend/data/
+*.db
+*.sqlite
+*.sqlite3
+
+# ML artifacts (large — train locally or use Git LFS for production)
+**/*.h5
+**/*.joblib
+!ai/models/README.md
+ai/models/checkpoints/
+ai/ai/
+
+# CICIDS2018 dataset (very large — download separately)
+ai/data/MachineLearningCVE/*.csv
+
+# Logs & OS
+logs/
+*.log
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Test & coverage
+coverage/
+.nyc_output/
+
+# PlantUML jar (generated locally)
+docs/plantuml.jar
