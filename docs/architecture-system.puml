@@ -1,0 +1,54 @@
+@startuml IPS_System_Architecture
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam componentStyle rectangle
+skinparam shadowing false
+title IPS — System Architecture (High Level)
+
+actor "Security Analyst" as User
+
+package "Frontend :3000" as FE #E3F2FD {
+  [React 19 Dashboard] as UI
+  [Vite Dev Server] as Vite
+  [Socket.io Client] as SockC
+  UI --> Vite
+  UI --> SockC
+}
+
+package "Backend :5000" as BE #E8F5E9 {
+  [Express REST API\n/api/v1] as API
+  [Socket.io Server] as SockS
+  [Threat Processing] as Threat
+  [IPS / Blocking] as IPS
+  [JWT Auth] as Auth
+  database "SQLite\nips.db" as DB
+  API --> Threat
+  API --> IPS
+  API --> Auth
+  Threat --> DB
+  IPS --> DB
+  Auth --> DB
+  SockS --> Threat
+}
+
+package "AI Service :5001" as AI #FFF3E0 {
+  [FastAPI Inference] as Inf
+  [ModelManager\nLSTM + Random Forest] as MM
+  folder "Model Artifacts\n*.h5, *.joblib" as Models
+  Inf --> MM
+  MM --> Models
+}
+
+User --> UI : HTTPS\nBrowser
+UI --> API : REST\n(proxied /api)
+SockC <--> SockS : WebSocket\nreal-time threats
+API --> Inf : POST /inference\n(AIInferenceService)
+Threat --> Inf
+
+note right of AI
+  Trained on CICIDS2018
+  50-feature vectors
+  Ensemble: LSTM + RF
+end note
+
+@enduml

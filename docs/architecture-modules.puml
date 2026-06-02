@@ -1,0 +1,69 @@
+@startuml IPS_Module_Decomposition
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam packageStyle rectangle
+title IPS — Module & Important Files
+
+package "frontend/" as FE #E3F2FD {
+  file "src/main.tsx" as main
+  file "src/App.tsx" as app
+  file "src/api/client.ts" as api
+  file "src/hooks/useSocket.ts" as sock
+  folder "src/pages/" as pages {
+    file "LoginPage.tsx"
+    file "DashboardPage.tsx"
+    file "AlertsPage.tsx"
+    file "IPSPage.tsx"
+    file "SimulatorPage.tsx"
+  }
+  file "vite.config.ts" as vite
+  main --> app
+  app --> pages
+  app --> sock
+  pages --> api
+  vite ..> api : proxy /api → :5000
+}
+
+package "backend/" as BE #E8F5E9 {
+  file "src/index.ts" as idx
+  folder "src/routes/" as routes
+  folder "src/services/" as svc {
+    file "AIInferenceService.ts"
+    file "ThreatProcessingService.ts"
+    file "IPSService.ts"
+    file "AlertService.ts"
+    file "SelfHealingEngine.ts"
+  }
+  file "src/database/sqlite.ts" as sql
+  file "src/websocket/PredictionEvents.ts" as ws
+  idx --> routes
+  idx --> ws
+  routes --> svc
+  svc --> sql
+  svc --> AIInferenceService.ts : HTTP
+}
+
+package "ai/" as AI #FFF3E0 {
+  file "inference/server.py" as server
+  folder "ml/training/" as train {
+    file "train.py"
+  }
+  folder "ml/models/" as mmodels {
+    file "lstm_ensemble.py"
+  }
+  folder "ml/features/" as feat {
+    file "feature_engineering.py"
+  }
+  folder "ml/data/" as data {
+    file "cicids_loader.py"
+  }
+  file "ml/utils/model_utils.py" as mu
+  server --> mu
+  train --> mmodels
+  train --> data
+  train --> feat
+}
+
+AIInferenceService.ts ..> server : POST /inference
+
+@enduml

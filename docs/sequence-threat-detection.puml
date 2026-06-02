@@ -1,0 +1,31 @@
+@startuml IPS_Threat_Detection_Flow
+!theme plain
+skinparam backgroundColor #FEFEFE
+title IPS — Threat Detection & Alert Flow
+
+actor User
+participant "Frontend" as FE
+participant "Backend API" as BE
+participant "ThreatProcessing\nService" as TP
+participant "AIInference\nService" as AI
+participant "FastAPI\ninference/server.py" as ML
+database "SQLite" as DB
+
+User -> FE : Submit flow / simulator
+FE -> BE : POST /api/v1/threats/...\n(JWT)
+BE -> TP : processThreat(features)
+TP -> AI : predict(features)
+AI -> ML : POST /inference
+ML --> AI : ensemble prediction\nrisk_score, attack_type
+AI --> TP : InferenceResponse
+TP -> DB : save alert, metrics
+TP -> BE : emit Socket.io event
+BE --> FE : threat:detected
+FE --> User : toast + sound + dashboard update
+
+alt risk >= threshold
+  TP -> BE : IPS block IP
+  BE -> DB : blocked_ips
+end
+
+@enduml
